@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('.carousel.slide.mx-auto').carousel({
+                interval: 100
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#" id="homeBtn">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="forecastBtn">Forecast</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="newsBtn">News</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="mapBtn">Map</a>
+                    </li>
+                </ul>
+                <h2 class="name d-flex align-content-center">🌍 Weather Forecast</h2>
+
+                <button id="darkModeToggle" class="btn btn-secondary">Dark Mode</button>
+            </div>
+        </div>
+    </nav>
+
+    <br>
+
+    <div id="carouselExample" class="carousel slide mx-auto" style="width: 50%; height: 20%; margin: auto;"
+        data-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="images/image1.jpg" class="d-block w-100" alt="image1">
+            </div>
+            <div class="carousel-item">
+                <img src="images/image2.jpg" class="d-block w-100" alt="image2">
+            </div>
+            <div class="carousel-item">
+                <img src="images/image3.jpg" class="d-block w-100" alt="image3">
+            </div>
+            <div class="carousel-item">
+                <img src="images/image4.jpg" class="d-block w-100" alt="image4">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div><br><br>
+
+    
+    <div class="card bg-success-subtle overflow-x-auto" style="width: auto; margin: auto; padding-top: 20px;">
+        <div class="d-flex" role="search">
+            <input id="searchLbl" class="form-control me-2" type="search" placeholder="Search Location" aria-label="Search">
+            <button id="searchBtn" class="btn btn-outline-success" type="submit">Search</button>
+        </div>
+        <br>
+        <div class="card-body bg-success-subtle overflow-x-auto">
+            <div class="card bg-info-subtle bs-dark-border-subtle"
+                style="width: auto; margin:auto; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.822);">
+                <div class="card-body bg-info-subtle ">
+                    <h3 class="card-title text-center fw-bold text-light bg-secondary">Current Weather</h3><br>
+                    <h2 id="crntLoc"></h2>
+                    <div class="col-md-10 d-flex align-items-start">
+                        <img src="" alt="condiImg" id="condiImg" class="ml-2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <h3 id="tempCel" class="ml-2 mb-0"></h3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <button id="celBtn" class="ml-2 mb-0 border-0 bg-transparent custom-text-size"
+                            type="submit"><b>° C</b></button>&nbsp;&nbsp;&nbsp;
+                        <LAbel class="custom-text-size"><b>/</b></LAbel>&nbsp;&nbsp;
+                        <button id="farBtn" class="ml-2 mb-0 border-0 bg-transparent custom-text-size"
+                            type="submit"><b>° F</b> </button>
+
+                        <div id="timedisplay1"
+                            class="d-flex justify-content-end align-items-center font-weight-bold custom-font">
+                            <h3><b>Local Time</b><br>
+                                &nbsp;&nbsp;<span id="timedisplay"> </span>
+                            </h3>
+                        </div>
+
+
+                    </div><br>
+
+                    <div class="overflow-x-auto" style="width: auto;">
+                        <table class="table table-bordered border-black mx-auto bg-success-subtle"
+                            style="width: h-auto">
+                            <thead>
+                                <tr>
+                                    <th>Location <br><img class="img" src="images/location_2838912.png"
+                                            alt="location icon" class="img-fluid"></th>
+                                    <th>Temperature <br><img class="img" src="images/hot_1684375.png" alt="temp icon"
+                                            class="img-fluid"> </th>
+                                    <th>Humidity <br><img class="img" src="images/dewpoint_6853879.png" alt="humid icon"
+                                            class="img-fluid"></th>
+                                    <th>Wind Speed <br><img class="img" src="images/wind-speed-icon-19.png"
+                                            alt="wind icon" class="img-fluid"></th>
+                                    <th>Condition <br><img class="img" src="images/weather-forecast_4365665.png"
+                                            alt="condition img" class="img-fluid"> </th>
+                                    <th>Region <br><img class="img" src="images/OIP.png" alt="region img"
+                                            class="img-fluid"></th>
+                                    <th>Country <br><img class="img" src="images/location_678367.png" alt="country icon"
+                                            class="img-fluid"></th>
+                                    <th class="text-center align-middle">Longitude</th>
+                                    <th class="text-center align-middle">Latitude</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="locationLbl"> </td>
+                                    <td id="tempLbl"> </td>
+                                    <td id="humidityLbl"> </td>
+                                    <td id="windspLbl"> </td>
+                                    <td id="conditionLbl"> </td>
+                                    <td id="regionLbl"> </td>
+                                    <td id="countryLbl"> </td>
+                                    <td id="logtitudeLbl" class="text-center"> </td>
+                                    <td id="latitudeLbl" class="text-center"> </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div><br>
+        <div id="forecastSection" class="card bg-info-subtle overflow-x-auto"
+            style="width: auto; margin: auto; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.822);">
+            <div class="card-body bg-info-subtle">
+                <h5 class="card-title text-center text-light fw-bold bg-secondary "><b>WEATHER FORECAST</b></h5>
+                <br>
+                <div class="d-flex justify-content-between">
+                    <button id="forecastPreviousBtn" type="button" class="btn btn-light"><b>Previous</b></button>
+                    <button id="forecastFutureBtn" type="button" class="btn btn-light"><b>Future</b></button>
+                </div><br>
+
+                <div class="overflow-x-auto" style="width: 100%">
+                    <table class="table table-bordered border-black mx-auto bg-success-subtle" style="width: 100%">
+                        <tbody>
+                            <tr>
+                                <th id="d0">Day 1</th>
+                                <th id="d1">Day 2</th>
+                                <th id="d2">Day 3</th>
+                                <th id="d3">Day 4</th>
+                                <th id="d4">Day 5</th>
+                                <th id="d5">Day 6</th>
+                                <th id="d6">Day 7</th>
+                            </tr>
+                            <tr>
+                                <td> <img id="icon0" src="" alt="conditionImg"> </td>
+                                <td> <img id="icon1" src="" alt="conditionImg"> </td>
+                                <td> <img id="icon2" src="" alt="conditionImg"> </td>
+                                <td> <img id="icon3" src="" alt="conditionImg"> </td>
+                                <td> <img id="icon4" src="" alt="conditionImg"> </td>
+                                <td> <img id="icon5" src="" alt="conditionImg"> </td>
+                                <td> <img id="icon6" src="" alt="conditionImg"> </td>
+                            </tr>
+                            <tr>
+                                <td id="condi0"> </td>
+                                <td id="condi1"> </td>
+                                <td id="condi2"> </td>
+                                <td id="condi3"> </td>
+                                <td id="condi4"> </td>
+                                <td id="condi5"> </td>
+                                <td id="condi6"> </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <div style="height: 20px;"></div>
+
+        <div class="card overflow-x-auto"
+            style="width: auto; margin: auto; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.822);">
+            <div class="card-body bg-info-subtle">
+                <h5 class="card-title text-center fw-bold text-light bg-secondary"><b>Search Forecast</b></h5><br>
+
+                <div class="d-flex justify-content-center">
+                    <h4>Select Date :</h4>&nbsp;&nbsp;&nbsp;
+                    <input id="startDate" type="date">&nbsp;&nbsp;&nbsp;
+                    <input id="endDate" type="date">,<br>
+                </div><br>
+                <button id="searchBtn1" type="button"
+                    class="btn btn-light d-flex align-content-center justify-content-center w-auto"><b>Search</b></button><br>
+                <div class="overflow-x-auto" style="width: 100%">
+                    <table class="table table-bordered border-black mx-auto bg-success-subtle" style="width: 100%">
+                        <tbody>
+                            <tr>
+                                <th id="D0">Day 1</th>
+                                <th id="D1">Day 2</th>
+                                <th id="D2">Day 3</th>
+                                <th id="D3">Day 4</th>
+                                <th id="D4">Day 5</th>
+                                <th id="D5">Day 6</th>
+                                <th id="D6">Day 7</th>
+                            </tr>
+                            <tr>
+                                <td> <img id="Icon0" src="" alt="conditionImg"> </td>
+                                <td> <img id="Icon1" src="" alt="conditionImg"> </td>
+                                <td> <img id="Icon2" src="" alt="conditionImg"> </td>
+                                <td> <img id="Icon3" src="" alt="conditionImg"> </td>
+                                <td> <img id="Icon4" src="" alt="conditionImg"> </td>
+                                <td> <img id="Icon5" src="" alt="conditionImg"> </td>
+                                <td> <img id="Icon6" src="" alt="conditionImg"> </td>
+                            </tr>
+                            <tr>
+                                <td id="Condi0">Condition</td>
+                                <td id="Condi1">Condition</td>
+                                <td id="Condi2">Condition</td>
+                                <td id="Condi3">Condition</td>
+                                <td id="Condi4">Condition</td>
+                                <td id="Condi5">Condition</td>
+                                <td id="Condi6">Condition</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div style="height: 20px;"></div>
+
+
+        <div id="mapSection" class="card overflow-x-auto"
+            style="width: 100%; margin: auto; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.822);">
+            <div class="card-body bg-info-subtle w-100%">
+                <h5 class="card-title text-center fw-bold text-light bg-secondary"><b>MAP</b></h5><br>
+                <div id="map"></div>
+            </div>
+        </div><br><br>
+    </div>
+
+
+    <footer class="footer mt-auto py-3" style="background-color: rgba(255, 255, 255, 0.432);">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" id="homeBtn1">Home</a></li>
+                        <li><a href="#" id="forecastBtn1">Forecast</a></li>
+                        <li><a href="#" id="newsBtn1">News</a></li>
+                        <li><a href="#" id="mapBtn1">Map</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h5>Contact Us</h5>
+                    <p>Email: dhanukapulsara.212@gmail.com</p>
+                    <p>Phone: +94 771435784</p>
+                    <div class="social-icons">
+                        <a href="#" class="fa fa-facebook"></a>
+                        <a href="#" class="fa fa-twitter"></a>
+                        <a href="#" class="fa fa-instagram"></a>
+                        <a href="#" class="fa fa-linkedin"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <p class="text-muted">Copyright &copy; 2024 Weather Forecast App. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="script.js"></script>
+
+</body>
+
+</html>

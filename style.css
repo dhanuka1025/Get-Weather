@@ -1,0 +1,51 @@
+.name {
+    color: white;
+}
+
+#carouselExample {
+    height: 500px;
+    width: 500px;
+}
+
+body {
+
+    background-image: url('images/bgimage.jpg');
+    background-size: cover;
+}
+
+.d-flex {
+    width: 700px;
+    margin: auto;
+}
+
+.headerTxt {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.img {
+    width: 30%;
+    vertical-align: middle;
+}
+
+.custom-text-size {
+    font-size: 25px;
+}
+
+.custom-font {
+    font-family: 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+#map {
+    height: 500px;
+}
+
+.dark-mode {
+    background-color: black;
+    color: white;
+}
+
+.light-mode {
+    background-color: white;
+    color: black;
+}
