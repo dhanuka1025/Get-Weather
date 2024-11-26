@@ -35,7 +35,6 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 function showPosition(position) {
     var latitude = position.coords.latitude;
     var longitude = position.coords.longitude;
-    console.log("Latitude: " + latitude + ", Longitude: " + longitude);
 
     map.eachLayer(function (layer) {
         if (layer instanceof L.Marker) {
@@ -50,7 +49,6 @@ function showPosition(position) {
     fetch(`https://api.weatherapi.com/v1/current.json?key=${key}&q=${lat}`)
         .then(response => response.json())
         .then(data => {
-            console.log(data);
             document.getElementById("condiImg").src = "https:" + data["current"]["condition"]["icon"];
             document.getElementById("tempCel").innerHTML = data["current"]["temp_c"] + "° C";
             document.getElementById("crntLoc").innerHTML = data["location"]["name"];
@@ -79,16 +77,16 @@ function showPosition(position) {
 function showError(error) {
     switch (error.code) {
         case error.PERMISSION_DENIED:
-            console.log("User denied the request for Geolocation.");
+            alert("User denied the request for Geolocation.");
             break;
         case error.POSITION_UNAVAILABLE:
-            console.log("Location information is unavailable.");
+            alert("Location information is unavailable.");
             break;
         case error.TIMEOUT:
-            console.log("The request to get user location timed out.");
+            alert("The request to get user location timed out.");
             break;
         case error.UNKNOWN_ERROR:
-            console.log("An unknown error occurred.");
+            alert("An unknown error occurred.");
             break;
     }
 }
@@ -97,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition, showError);
     } else {
-        console.log("Geolocation is not supported by this browser.");
+        alert("Geolocation is not supported by this browser.");
     }
 });
 
@@ -113,7 +111,6 @@ document.getElementById("searchBtn").addEventListener("click", () => {
     fetch(`https://api.weatherapi.com/v1/current.json?key=${key}&q=${searchVal}`)
         .then(response => response.json())
         .then(data => {
-            console.log(data);
             document.getElementById("condiImg").src = "https:" + data["current"]["condition"]["icon"];
             document.getElementById("tempCel").innerHTML = data["current"]["temp_c"] + "° C";
             document.getElementById("crntLoc").innerHTML = data["location"]["name"];
@@ -157,7 +154,6 @@ document.getElementById("searchBtn").addEventListener("click", () => {
 
 async function showForecast() {
     let Clocation = document.getElementById("crntLoc").innerText;
-    console.log(Clocation);
 
     if (Clocation != "") {
         let today = new Date();
@@ -170,7 +166,6 @@ async function showForecast() {
                 let month = (date.getMonth() + 1).toString().padStart(2, '0');
                 let day = date.getDate().toString().padStart(2, '0');
                 let formattedDate = year + '-' + month + '-' + day;
-                console.log(formattedDate);
                 fetch(`https://api.weatherapi.com/v1/forecast.json?key=${key}&q=${Clocation}&dt=${formattedDate}`)
                     .then(response => {
                         if (!response.ok) {
@@ -179,7 +174,6 @@ async function showForecast() {
                         return response.json();
                     })
                     .then(data => {
-                        console.log(data);
                         let forecastDate = data["forecast"]["forecastday"][0]["date"];
                         let conditionText = data["forecast"]["forecastday"][0]["day"]["condition"]["text"];
 
@@ -198,7 +192,6 @@ async function showForecast() {
 
 document.getElementById("forecastPreviousBtn").addEventListener("click", () => {
     let Clocation = document.getElementById("crntLoc").innerText;
-    console.log(Clocation);
 
     if (Clocation != "") {
         let today = new Date();
@@ -211,7 +204,6 @@ document.getElementById("forecastPreviousBtn").addEventListener("click", () => {
                 let month = (date.getMonth() + 1).toString().padStart(2, '0');
                 let day = date.getDate().toString().padStart(2, '0');
                 let formattedDate = year + '-' + month + '-' + day;
-                console.log(formattedDate);
                 fetch(`https://api.weatherapi.com/v1/history.json?key=${key}&q=${Clocation}&dt=${formattedDate}`)
                     .then(response => {
                         if (!response.ok) {
@@ -220,7 +212,6 @@ document.getElementById("forecastPreviousBtn").addEventListener("click", () => {
                         return response.json();
                     })
                     .then(data => {
-                        console.log(data);
                         let forecastDate = data["forecast"]["forecastday"][0]["date"];
                         let conditionText = data["forecast"]["forecastday"][0]["day"]["condition"]["text"];
 
@@ -241,37 +232,30 @@ document.getElementById("searchBtn").addEventListener("click", showForecast)
 
 async function showSearchForecast() {
     let Clocation = document.getElementById("crntLoc").innerText;
-    console.log(Clocation);
 
     if (Clocation != "") {
         let Sdate = new Date(document.getElementById("startDate").value);
-        console.log(Sdate);
         let Edate = new Date(document.getElementById("endDate").value);
-        console.log(Edate);
 
         let differenceInMilliseconds = Edate - Sdate;
 
         let differenceInDays = differenceInMilliseconds / (1000 * 60 * 60 * 24);
-        console.log(differenceInDays);
 
         if (differenceInDays = 7) {
 
             let Clocation = document.getElementById("crntLoc").innerText;
-            console.log(Clocation);
 
             let Syear = Sdate.getFullYear();
             let Smonth = (Sdate.getMonth() + 1).toString().padStart(2, '0');
             let Sday = Sdate.getDate().toString().padStart(2, '0');
 
             let FormattedStartDate = Syear + '-' + Smonth + '-' + Sday;
-            console.log(FormattedStartDate);
 
             let Eyear = Edate.getFullYear();
             let Emonth = (Edate.getMonth() + 1).toString().padStart(2, '0');
             let Eday = Edate.getDate().toString().padStart(2, '0');
 
             let FormattedEndDate = Eyear + '-' + Emonth + '-' + Eday;
-            console.log(FormattedEndDate);
 
             fetch(`https://api.weatherapi.com/v1/history.json?key=${key}&q=${Clocation}&dt=${FormattedStartDate}&end_dt=${FormattedEndDate}`)
                 .then(response => {
@@ -281,7 +265,6 @@ async function showSearchForecast() {
                     return response.json();
                 })
                 .then(data => {
-                    console.log(data);
                     for (let i = 0; i < 7; i++) {
                         let forecastDate = data["forecast"]["forecastday"][i]["date"];
                         let conditionText = data["forecast"]["forecastday"][i]["day"]["condition"]["text"];
