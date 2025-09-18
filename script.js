@@ -101,53 +101,133 @@ document.addEventListener('DOMContentLoaded', function () {
 
 //-------------------------------------------------------------------------------------------------------------------//
 
+// Enhanced Search Functionality
 document.getElementById("searchBtn").addEventListener("click", () => {
-    let searchVal = document.getElementById("searchLbl").value
-
-    let reop = {
-        methord: "GET"
-    };
-
+    let searchVal = document.getElementById("searchLbl").value.trim();
+    
+    if (!searchVal) {
+        showNotification("Please enter a location to search", "warning");
+        return;
+    }
+    
+    // Show loading state
+    showLoadingState();
+    
     fetch(`https://api.weatherapi.com/v1/current.json?key=${key}&q=${searchVal}`)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById("condiImg").src = "https:" + data["current"]["condition"]["icon"];
-            document.getElementById("tempCel").innerHTML = data["current"]["temp_c"] + "° C";
-            document.getElementById("crntLoc").innerHTML = data["location"]["name"];
-            document.getElementById("locationLbl").innerHTML = data["location"]["tz_id"];
-            document.getElementById("tempLbl").innerHTML = data["current"]["temp_c"] + "° C";
-            document.getElementById("humidityLbl").innerHTML = data["current"]["humidity"];
-            document.getElementById("windspLbl").innerHTML = data["current"]["wind_mph"] + " mph";
-            document.getElementById("conditionLbl").innerHTML = data["current"]["condition"]["text"];
-            document.getElementById("regionLbl").innerHTML = data["location"]["region"];
-            document.getElementById("countryLbl").innerHTML = data["location"]["country"];
-            document.getElementById("logtitudeLbl").innerHTML = data["location"]["lon"];
-            document.getElementById("latitudeLbl").innerHTML = data["location"]["lat"];
-
-            showForecast();
-
-            document.getElementById("celBtn").addEventListener("click", () => {
-                document.getElementById("tempCel").innerHTML = data["current"]["temp_c"] + "° C";
-            });
-            document.getElementById("farBtn").addEventListener("click", () => {
-                document.getElementById("tempCel").innerHTML = data["current"]["temp_f"] + "° F";
-            });
-
-            map.eachLayer(function (layer) {
-                if (layer instanceof L.Marker) {
-                    map.removeLayer(layer);
-                }
-            });
-
-            let lat = data["location"]["lat"];
-            let lon = data["location"]["lon"];
-
-            L.marker([lat, lon]).addTo(map);
-            map.setView([lat, lon], 13);
-
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Location not found');
+            }
+            return response.json();
         })
-        .then(error => console.log("error", error));
+        .then(data => {
+            // Update weather display with animation
+            updateWeatherDisplay(data);
+            showForecast();
+            updateMapLocation(data);
+            showNotification(`Weather data loaded for ${data["location"]["name"]}`, "success");
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            showNotification("Location not found. Please try a different city.", "error");
+            hideLoadingState();
+        });
 });
+
+// Enhanced weather display update function
+function updateWeatherDisplay(data) {
+    // Add fade animation
+    const weatherCard = document.querySelector('.weather-main');
+    weatherCard.style.opacity = '0';
+    
+    setTimeout(() => {
+        document.getElementById("condiImg").src = "https:" + data["current"]["condition"]["icon"];
+        document.getElementById("tempCel").innerHTML = data["current"]["temp_c"] + "° C";
+        document.getElementById("crntLoc").innerHTML = data["location"]["name"];
+        document.getElementById("locationLbl").innerHTML = data["location"]["tz_id"];
+        document.getElementById("tempLbl").innerHTML = data["current"]["temp_c"] + "° C";
+        document.getElementById("humidityLbl").innerHTML = data["current"]["humidity"] + "%";
+        document.getElementById("windspLbl").innerHTML = data["current"]["wind_mph"] + " mph";
+        document.getElementById("conditionLbl").innerHTML = data["current"]["condition"]["text"];
+        document.getElementById("regionLbl").innerHTML = data["location"]["region"];
+        document.getElementById("countryLbl").innerHTML = data["location"]["country"];
+        document.getElementById("logtitudeLbl").innerHTML = data["location"]["lon"];
+        document.getElementById("latitudeLbl").innerHTML = data["location"]["lat"];
+        
+        weatherCard.style.opacity = '1';
+        hideLoadingState();
+    }, 300);
+    
+    // Update temperature toggle buttons
+    document.getElementById("celBtn").addEventListener("click", () => {
+        document.getElementById("tempCel").innerHTML = data["current"]["temp_c"] + "° C";
+    });
+    document.getElementById("farBtn").addEventListener("click", () => {
+        document.getElementById("tempCel").innerHTML = data["current"]["temp_f"] + "° F";
+    });
+}
+
+// Update map location
+function updateMapLocation(data) {
+    map.eachLayer(function (layer) {
+        if (layer instanceof L.Marker) {
+            map.removeLayer(layer);
+        }
+    });
+
+    let lat = data["location"]["lat"];
+    let lon = data["location"]["lon"];
+
+    L.marker([lat, lon]).addTo(map);
+    map.setView([lat, lon], 13);
+}
+
+// Loading state functions
+function showLoadingState() {
+    const searchBtn = document.getElementById("searchBtn");
+    searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+    searchBtn.disabled = true;
+}
+
+function hideLoadingState() {
+    const searchBtn = document.getElementById("searchBtn");
+    searchBtn.innerHTML = '<i class="fas fa-search"></i> Search';
+    searchBtn.disabled = false;
+}
+
+// Notification system
+function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existingNotification = document.querySelector('.notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+    
+    const notification = document.createElement('div');
+    notification.className = `notification alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    `;
+    
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
+}
 
 //-------------------------------------------------------------------------------------------------------------------//
 
@@ -315,9 +395,106 @@ document.getElementById("mapBtn1").addEventListener("click", function() {
 
 //-------------------------------------------------------------------------------------------------------------------//
 
+// Enhanced Dark Mode Toggle
 document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById("darkModeToggle").addEventListener("click", function() {
+    const darkModeToggle = document.getElementById("darkModeToggle");
+    const darkModeText = document.getElementById("darkModeText");
+    
+    // Check for saved theme preference or default to light mode
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    if (currentTheme === 'dark') {
+        document.body.classList.add("dark-mode");
+        darkModeText.textContent = "☀️ Light Mode";
+    }
+    
+    darkModeToggle.addEventListener("click", function() {
         document.body.classList.toggle("dark-mode");
-        document.querySelectorAll(".btn").forEach(btn => btn.classList.toggle("dark-mode"));
+        
+        // Update button text and save preference
+        if (document.body.classList.contains("dark-mode")) {
+            darkModeText.textContent = "☀️ Light Mode";
+            localStorage.setItem('theme', 'dark');
+        } else {
+            darkModeText.textContent = "🌙 Dark Mode";
+            localStorage.setItem('theme', 'light');
+        }
+        
+        // Add smooth transition effect
+        document.body.style.transition = 'all 0.3s ease';
+    });
+    
+    // Add loading animations
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.classList.add('fade-in');
+    });
+    
+    // Add hover effects to forecast cards
+    const forecastCards = document.querySelectorAll('.forecast-card');
+    forecastCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+    
+    // Add search input focus effects and keyboard support
+    const searchInput = document.getElementById('searchLbl');
+    if (searchInput) {
+        searchInput.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'scale(1.02)';
+        });
+        
+        searchInput.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'scale(1)';
+        });
+        
+        // Add Enter key support for search
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('searchBtn').click();
+            }
+        });
+    }
+    
+    // Add smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+    
+    // Add intersection observer for scroll animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+    
+    // Observe all cards for scroll animations
+    document.querySelectorAll('.card').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(card);
     });
 });
